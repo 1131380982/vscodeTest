@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="js/list_page.js"></script>
+    <link href="css/list_page.css" type="text/css" rel="stylesheet" />
+</head>
+
+<body>
+    <div class="list">
+
+    </div>
+    <div class="Userlist1">
+    </div>
+    <div class="Userlist2">
+    </div>
+    <div class="Userlist3">
+    </div>
+    <script>
+
+        window.onload = function () {
+            //URL跳转分页
+            var listpage1 = new list_page({
+               // PageIndex: 1,        //当前页码 不写此参数则选择从URL参数 PageParameter 获取当前页码
+                PageSize: 5,        //每页条数
+                ShowPage: 5,         //显示的分页数 默认5
+                ListCount: 100, //总计数
+                Elmement: ".Userlist1", //要显示在页面的位置
+                PageParameter: "page",  //当前页码的URL的参数名     IsHref=true时必填
+             //   IsFirstLast: true,       //是否显示首页尾页  默认false
+             //   IsPreviousNext: false,  //是否显示上一页下一页 默认false
+                IsHref: true,           //是否用href链接跳转 默认true  ,  false 表示通过异步获取
+
+            });
+
+
+
+            //使用异步分页  PageAjax  异步获取结果时 PageIndex=1    PageParameter  可不写，写了也没用
+            var listpage2 = new list_page({
+                PageIndex: 1,        //当前页码 不写此参数则选择从URL参数 PageParameter 获取当前页码
+                PageSize: 5,        //每页条数
+                ShowPage: 5,         //显示的分页数 默认5
+                ListCount: 0, //总计数
+                Elmement: ".Userlist2", //要显示在页面的位置
+               // PageParameter: "page",  //当前页码的URL的参数名     
+                IsFirstLast: true,       //是否显示首页尾页     默认false
+               // IsPreviousNext: false,  //是否显示上一页下一页   默认false
+                IsHref: false,           //是否用href链接跳转 false 表示通过异步获取
+                PageAjax: function (PageIndex, option) {  //PageIndex 要跳转的页码  option 参数
+                    //  此处可以异步加载数据  最后返回true  加载失败则返回true
+
+                    // //模拟异步获取值
+                    // var retbool = false;
+                    // try {
+                    //     $.ajax({
+                    //         url: "xxxxxx",
+                    //         data: { PageIndex: PageIndex },
+                    //         dataType: "json",
+                    //         success: function (data) {
+                    //             // var data=testdata.slice((option.PageSize*(PageIndex-1)),option.PageSize*PageIndex);
+                    //             var pagehtml = document.querySelector(".list");
+                    //             pagehtml.innerHTML = "";
+                    //             data.Users.forEach(element => {
+                    //                 pagehtml.innerHTML += "ID: " + element.id + "   </br>";
+                    //             });
+                    //             // 更新参数
+                    //             option.PageIndex = PageIndex;
+                    //             option.ListCount = data.Users.length;
+                    //             retbool = true;
+                    //         },
+                    //         error: function () {
+                    //         }
+                    //     });                       
+                    //     return retbool;
+                    // } catch (e) {
+                    //     return false;
+                    // }
+                    
+
+                    //模拟从JS数据获取
+                    var data=testdata.slice((option.PageSize*(PageIndex-1)),option.PageSize*PageIndex);
+                    var pagehtml = document.querySelector(".list");
+                    pagehtml.innerHTML = "";
+                    data.forEach(element => {
+                        pagehtml.innerHTML += "ID: " + element.id + "   </br>";
+                    });
+
+                    option.PageIndex = PageIndex;
+                    option.ListCount = testdata.length;
+                    return true;
+                }
+            });
+        }
+        var testdata = [
+            { id: 1, name: "张  1", sex: "男" },
+            { id: 2, name: "张  2", sex: "男" },
+            { id: 3, name: "张  3", sex: "男" },
+            { id: 4, name: "张  4", sex: "男" },
+            { id: 5, name: "张  5", sex: "男" },
+            { id: 6, name: "张  6", sex: "男" },
+            { id: 7, name: "张  7", sex: "男" },
+            { id: 8, name: "张  8", sex: "男" },
+            { id: 9, name: "张  9", sex: "男" },
+            { id: 10, name: "张  10", sex: "男" },
+            { id: 11, name: "张  11", sex: "男" },
+            { id: 12, name: "张  12", sex: "男" },
+            { id: 13, name: "张  13", sex: "男" },
+            { id: 14, name: "张  14", sex: "男" },
+            { id: 15, name: "张  15", sex: "男" },
+            { id: 16, name: "张  16", sex: "男" },
+            { id: 17, name: "张  17", sex: "男" },
+            { id: 18, name: "张  18", sex: "男" },
+            { id: 19, name: "张  19", sex: "男" },
+            { id: 20, name: "张  20", sex: "男" },
+            { id: 21, name: "张  21", sex: "男" },
+            { id: 22, name: "张  22", sex: "男" },
+            { id: 23, name: "张  23", sex: "男" },
+            { id: 24, name: "张  24", sex: "男" },
+            { id: 25, name: "张  25", sex: "男" },
+            { id: 26, name: "张  26", sex: "男" },
+            { id: 27, name: "张  27", sex: "男" },
+            { id: 28, name: "张  28", sex: "男" },
+            { id: 29, name: "张  29", sex: "男" },
+            { id: 30, name: "张  30", sex: "男" },
+            { id: 31, name: "张  31", sex: "男" },
+            { id: 32, name: "张  32", sex: "男" },
+            { id: 33, name: "张  33", sex: "男" },
+            { id: 34, name: "张  34", sex: "男" },
+            { id: 35, name: "张  35", sex: "男" },
+            { id: 36, name: "张  36", sex: "男" },
+            { id: 37, name: "张  37", sex: "男" },
+            { id: 38, name: "张  38", sex: "男" },
+            { id: 39, name: "张  39", sex: "男" },
+            { id: 40, name: "张  40", sex: "男" },
+            { id: 41, name: "张  41", sex: "男" },
+            { id: 42, name: "张  42", sex: "男" },
+            { id: 43, name: "张  43", sex: "男" },
+            { id: 44, name: "张  44", sex: "男" },
+            { id: 45, name: "张  45", sex: "男" },
+            { id: 46, name: "张  46", sex: "男" },
+            { id: 47, name: "张  47", sex: "男" },
+            { id: 48, name: "张  48", sex: "男" },
+            { id: 49, name: "张  49", sex: "男" },
+            { id: 50, name: "张  50", sex: "男" },
+            { id: 51, name: "张  51", sex: "男" },
+            { id: 52, name: "张  52", sex: "男" },
+            { id: 53, name: "张  53", sex: "男" },
+            { id: 54, name: "张  54", sex: "男" },
+            { id: 55, name: "张  55", sex: "男" },
+            { id: 56, name: "张  56", sex: "男" },
+            { id: 57, name: "张  57", sex: "男" },
+            { id: 58, name: "张  58", sex: "男" },
+            { id: 59, name: "张  59", sex: "男" },
+            { id: 60, name: "张  60", sex: "男" },
+            { id: 61, name: "张  61", sex: "男" },
+            { id: 62, name: "张  62", sex: "男" },
+            { id: 63, name: "张  63", sex: "男" },
+            { id: 64, name: "张  64", sex: "男" },
+            { id: 65, name: "张  65", sex: "男" },
+            { id: 66, name: "张  66", sex: "男" },
+            { id: 67, name: "张  67", sex: "男" },
+            { id: 68, name: "张  68", sex: "男" },
+            { id: 69, name: "张  69", sex: "男" },
+        ];
+    </script>
+</body>
+
+</html>
