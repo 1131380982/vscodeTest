@@ -13,26 +13,26 @@
     };
 
     var list_page = function (options) {
-        document.querySelector(options.Elmement).className += " list_page";;
-        this.init(options);
+        document.querySelector(options.Elmement).className += " list_page";
+
+        for (var key in options) {
+            _options[key] = options[key]
+        }
+        this.options = _options;
+        if (!this.options.IsHref) {
+            this.options.PageAjax(1, this.options);
+        }
+        this.init(this.options);
     };
     list_page.prototype = {
         init: function (options) {
-            for (var key in options) {
-                _options[key] = options[key]
-            }
-
-            this.options = _options;
-            // console.log(this.options);
+            
             var ListCount = this.options.ListCount;
             var PageIndex = this.options.PageIndex;
             var PageSize = this.options.PageSize;
             var ShowPage = this.options.ShowPage;
             var PageUrl = "";
             if (!this.options.IsHref) {
-                if (!this.options.PageAjax(this.options.PageIndex, this.options)) {
-                    console.log("PageAjax 出现问题")
-                }
                 //首次加载之后重新获取数据
                 ListCount = this.options.ListCount;
                 PageIndex = this.options.PageIndex;
@@ -65,7 +65,7 @@
                 //处理URL参数结束
 
             }
-
+            
             var PageCount = (ListCount % PageSize == 0 ? parseInt(ListCount / PageSize) : parseInt(ListCount / PageSize) + 1);
             if (PageIndex > PageCount) {
                 PageIndex = PageCount;
@@ -74,16 +74,17 @@
                 PageIndex = 1;
             }
             var startPage = PageIndex - parseInt(ShowPage / 2); //开始页码
-            if (ListCount <= ShowPage || startPage < 1 || PageCount <= ShowPage) {
+            if (ListCount <= PageSize || startPage < 1 || PageCount <= ShowPage) {
                 startPage = 1;
             }
-            if (startPage > (PageCount - ShowPage) && (PageCount - ShowPage) >= 0) {
+            if (startPage > (PageCount - ShowPage) && (PageCount - ShowPage) > 0) {
                 if (this.options.IsFirstLast) {
                     startPage = (PageCount - ShowPage);
                 } else {
                     startPage = (PageCount - ShowPage) + 1;
                 }
             }
+
 
             var endPage = PageIndex + parseInt(ShowPage / 2);  //结束页码
             if (PageIndex <= parseInt(ShowPage / 2) + 1) {
@@ -96,7 +97,7 @@
             if (endPage > PageCount) {
                 endPage = PageCount;
             }
-
+            console.log(startPage+"_"+endPage);
 
             var html = '<ul>';
             if (this.options.IsPreviousNext && PageIndex != 1) {
@@ -107,6 +108,7 @@
                 var url = PageUrl.replace(/__page__/, 1);
                 html += this.AddStr(1, url, 1);
             }
+           
             for (var i = startPage; i <= endPage; i++) {
                 var url = PageUrl.replace(/__page__/, i);
                 if (i == PageIndex) {
@@ -131,7 +133,7 @@
             pagehtml.innerHTML = html;
             this.data_click();
         },
-        AddStr: function (page, url, txt, cssclass = "") {
+        AddStr: function (page, url, txt, cssclass="") {
             var datalistpage;
             var cssclassStr;
             if (url != null && url.length > 0) {
@@ -148,20 +150,20 @@
                 return '<li><a ' + url + '  ' + cssclassStr + ' >' + txt + '</a></li>';
             }
         },
-        data_click: function () {  //异步添加点击事件
-            var list = document.querySelectorAll(".datalistpage");
-            that = this;
-            for (var index = 0; index < list.length; index++) {
-                list[index].onclick = function () {
-                    var page = this.getAttribute("data-list-page");
-                    if (that.options.PageAjax(page, that.options)) {  //执行回调函数获取结果
+            data_click: function () {  //异步添加点击事件
+                var list = document.querySelectorAll(".datalistpage");
+                that = this;
+                for (var index = 0; index < list.length; index++) {
+                    list[index].onclick = function () {
+                        var page = this.getAttribute("data-list-page");
+                        that.options.PageAjax(page, that.options)
                         that.options.PageIndex = parseInt(page);
                         that.init(that.options);
+
                     }
                 }
             }
-        }
-    };
+        };
 
     window.list_page = list_page;
 })();
