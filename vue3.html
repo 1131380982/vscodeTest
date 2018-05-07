@@ -10,17 +10,20 @@
 
 <body>
     <div id="app">
-        <P>{{model.name}}</P>
-        <input type="text" v-model="model.name" />
-        <input type="text" v-model="userlist[0].address[0].city" />
-        <input type="text" v-model="userlist[0].address[0].city" />
-        <button v-on:click='sayHi'>change model</button>
+        <div>
+            <div>{{model.name}}</div>
+            <input type="text" v-model="model.name" />
+            <input type="text" v-model="userlist[0].address[0].city" />
+            <input type="text" v-model="userlist[0].address[0].city" />
+            <button v-on:click='sayHi'>change model</button>
+        </div>
+
     </div>
     <script>
         (function (global, factory) {
             global.Vue = factory();
         })(this, function () {
-            var Vue = function (options) { 
+            var Vue = function (options) {
                 if (typeof options != "object") {
                     console.log('请传入一个对象');
                     return;
@@ -32,7 +35,7 @@
                 }
                 this.$el = document.querySelector(options.el);
                 this.$methods = options.methods;
-               // console.log('-------------------------');
+                // console.log('-------------------------');
                 this._compile(this.$el);
 
             };
@@ -112,14 +115,9 @@
                                     }
                                 }
 
-                                _this._databing[attrVal].update.push(new watcher(
-                                    'input',
-                                    node,
-                                    _this,
-                                    _value,
-                                    name,
-                                    'value'
-                                ));
+                                _this._databing[attrVal].update.push(new watcher(() => {
+                                    node.value = _value[name];
+                                }));
                             }
                             {
                                 node.addEventListener('input', function (e) {
@@ -156,14 +154,9 @@
                                 _value = _value[attrs[a]];
                             }
                         }
-                        _this._databing[attrVal].update.push(new watcher(
-                            'input',
-                            node,
-                            _this,
-                            _value,
-                            name,
-                            'innerHTML'
-                        ));
+                        _this._databing[attrVal].update.push(new watcher(() => {
+                            node.innerHTML = _value[name];
+                        }));
                     }
                 }
             };
@@ -176,16 +169,11 @@
                 return obj;
 
             }
-            function watcher(name, el, vm, obj, objname, attr) {
-                this.name = name;//指令名称--这里还没有用到
-                this.el = el;//指令对应的DOM元素
-                this.obj = obj;//指令对应的值--也就是指令所对应的data中的属性名
-                this.objname = objname;//指令对应的值--也就是指令所对应的data中的属性名
-                this.attr = attr;//属性值
+            function watcher(fn) {
+                this.fn = fn;
                 this.update = function () {
-                    this.el[this.attr] = this.obj[this.objname];
+                    this.fn();
                 }
-                //实例该对象的时候执行更新dom方法
                 this.update();
             };
             return Vue;
