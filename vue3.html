@@ -113,7 +113,6 @@
                                 }
                                 _this._databing[attrVal].update.push(new watcher(node, _value, name, true, (_node, _value, _name) => {
                                     _node.value = _value[_name];
-                                    return;
                                 }));
                             }
                             {
@@ -168,16 +167,13 @@
                         _this._databing[attrVal].update.push(new watcher(node, _value, name, false, (_node, _value, _name) => {
                             node.innerHTML = innerHTML;
                             attrstemplate(_this, node, innerHTML, true);
-                            return;
                         }));
                         return attrstemplate(_this, node, innerHTML, false);
                     }else{
                         return attrstemplate(_this, node, innerHTML, true);
                     }
-                    
                 }
             }
-
             function watcher(node, _value, name, isnow, fn) {
                 this.node = node;
                 this._value = _value;
@@ -186,11 +182,9 @@
                 this.isnow = isnow;
                 this.update = function () {
                     this.fn(this.node, this._value, this.name);
-                    return;
                 }
                 if (this.isnow) {
                     this.update();
-                    return;
                 }
             };
             return Vue;
