@@ -11,14 +11,13 @@
 <body>
     <div id="app">
         <div>
-            <div>{{model.name}}{{model.name}}</div>
+            <div>{{model.name}}{{model.name}}{{userlist[0].address[0].city}}</div>
             <input type="text" v-model="model.name" />
             <input type="text" v-model="model.name" />
             <input type="text" id="city1" v-model="userlist[0].address[0].city" />
             <input type="text" id="city2" v-model="userlist[0].address[0].city" />
             <button v-on:click='sayHi'>change model</button>
         </div>
-
     </div>
     <script>
         (function (global, factory) {
@@ -91,8 +90,8 @@
 
                     var innerHtml = node.innerHTML;
                     if (innerHtml.indexOf("{{") > -1 && innerHtml.indexOf("}}") > -1) {  //处理{{XXXX}} 模板                                  
-                       var htmls= attrstemplate(_this, node,innerHtml,false);
-                      // console.log(htmls)
+                        var htmls = attrstemplate(_this, node, innerHtml, false);
+                        // console.log(htmls)
                     }
 
                     var attrs = node.attributes;//属性集合
@@ -121,7 +120,8 @@
                                         _value = _value[attrVals[a]];
                                     }
                                 }
-                                _this._databing[attrVal].update.push(new watcher(node,_value,name, (_node,_value,_name) => {
+                                _this._databing[attrVal].update.push(new watcher(node, _value, name,true, (_node, _value, _name) => {
+                                  //  console.log(attrVal);
                                     _node.value = _value[_name];
                                 }));
                             }
@@ -155,7 +155,7 @@
                 }
                 return obj;
             }
-            function attrstemplate(_this, node, innerHTML,ischange) {
+            function attrstemplate(_this, node, innerHTML) {
                 var html = node.innerHTML;
                 if (html.indexOf("{{") > -1 && html.indexOf("}}") > -1) {
                     var attrVal = html.substring(html.indexOf("{{") + 2, html.indexOf("}}"));
@@ -174,13 +174,13 @@
                     var firststr = html.substring(0, html.indexOf("{{"));
                     var laststr = html.substring(html.indexOf("}}") + 2);
                     node.innerHTML = firststr + _value[name] + laststr;
-                    if(!ischange){
-                        _this._databing[attrVal].update.push(new watcher(node,_value,name,(_node,_value,_name) => {
-                        node.innerHTML=innerHTML;
+                    console.log(attrVal);
+                    _this._databing[attrVal].update.push(new watcher(node, _value, name,false, (_node, _value, _name) => {
+
+                        node.innerHTML = innerHTML;
                         attrstemplate2(_this, node, innerHTML);
                     }));
-                    }
-                    return attrstemplate(_this, node, innerHTML,false);
+                    return attrstemplate(_this, node, innerHTML);
                 }
             }
             function attrstemplate2(_this, node, innerHTML) {
@@ -205,15 +205,19 @@
                     return attrstemplate2(_this, node, innerHTML);
                 }
             }
-            function watcher(node,_value,name,  fn) {
+            function watcher(node, _value, name,isnow, fn) {
                 this.node = node;
                 this._value = _value;
                 this.name = name;
                 this.fn = fn;
+                this.isnow=isnow;
                 this.update = function () {
-                    this.fn(this.node,this._value,this.name);
+                    this.fn(this.node, this._value, this.name);
                 }
-                this.update();
+                if(this.isnow){
+                    this.update();
+                }
+                
             };
             return Vue;
         });
