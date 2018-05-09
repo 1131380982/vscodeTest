@@ -174,9 +174,7 @@
                     var firststr = html.substring(0, html.indexOf("{{"));
                     var laststr = html.substring(html.indexOf("}}") + 2);
                     node.innerHTML = firststr + _value[name] + laststr;
-                    console.log(attrVal);
                     _this._databing[attrVal].update.push(new watcher(node, _value, name,false, (_node, _value, _name) => {
-
                         node.innerHTML = innerHTML;
                         attrstemplate2(_this, node, innerHTML);
                     }));
@@ -222,7 +220,7 @@
             return Vue;
         });
 
-        var vue1 = new Vue({
+        var vue1 = new Vue({  //{{xxxx}} 模板不支持和标签在同一级
             el: "#app",
             data: {
                 model: { name: "name1" },
@@ -233,12 +231,12 @@
             },
             methods: {
                 sayHi: function () {
+                    vue1.model.name="name2";
                     console.log(1);
                 }
             }
-
         });
-        console.log(vue1)
+        console.log(vue1.model)
     </script>
 </body>
 
