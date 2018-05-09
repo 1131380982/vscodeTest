@@ -156,9 +156,6 @@
                 return obj;
             }
             function attrstemplate(_this, node, innerHTML,ischange) {
-                // if(ischange){
-                //     node.innerHTML=innerHTML;
-                // }
                 var html = node.innerHTML;
                 if (html.indexOf("{{") > -1 && html.indexOf("}}") > -1) {
                     var attrVal = html.substring(html.indexOf("{{") + 2, html.indexOf("}}"));
@@ -176,20 +173,36 @@
                     }
                     var firststr = html.substring(0, html.indexOf("{{"));
                     var laststr = html.substring(html.indexOf("}}") + 2);
-                    
+                    node.innerHTML = firststr + _value[name] + laststr;
                     if(!ischange){
                         _this._databing[attrVal].update.push(new watcher(node,_value,name,(_node,_value,_name) => {
-                       // node.innerHTML=innerHTML;
-                        //var html=attrstemplate(_this, node, innerHTML,true);
-                        node.innerHTML = firststr + _value[name] + laststr;
-                        //_node.innerHTML =html;
+                        node.innerHTML=innerHTML;
+                        attrstemplate2(_this, node, innerHTML);
                     }));
-                    node.innerHTML = firststr + _value[name] + laststr;
                     }
-
-
-                    
                     return attrstemplate(_this, node, innerHTML,false);
+                }
+            }
+            function attrstemplate2(_this, node, innerHTML) {
+                var html = node.innerHTML;
+                if (html.indexOf("{{") > -1 && html.indexOf("}}") > -1) {
+                    var attrVal = html.substring(html.indexOf("{{") + 2, html.indexOf("}}"));
+                    var attrs = attrVal.split(".");
+                    var name = attrs[attrs.length - 1];
+                    var _value = _this;
+
+                    for (var a = 0; a < attrs.length - 1; a++) {
+                        if (attrs[a].indexOf("[") > -1 && attrs[a].indexOf("]") > -1) {
+                            var model = attrs[a].substring(0, attrs[a].indexOf("["));
+                            _value = attrsArr(_value[model], attrs[a]);
+                        } else {
+                            _value = _value[attrs[a]];
+                        }
+                    }
+                    var firststr = html.substring(0, html.indexOf("{{"));
+                    var laststr = html.substring(html.indexOf("}}") + 2);
+                    node.innerHTML = firststr + _value[name] + laststr;
+                    return attrstemplate2(_this, node, innerHTML);
                 }
             }
             function watcher(node,_value,name,  fn) {
