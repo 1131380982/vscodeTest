@@ -11,8 +11,11 @@
 <body>
     <div id="app">
         <div>
-                <!-- {{model.name}}{{model.name}}{{userlist[0].address[0].city}} 不支持和标签同级-->
-            <div>{{model.name}}{{model.name}}{{userlist[0].address[0].city}}</div>
+               
+            <div>
+                {{model.name}}{{model.name}}{{userlist[0].address[0].city}}   
+                <!-- {{model.name}} 模板不支持和标签同级-->
+            </div>
             <input type="text" v-model="model.name" />
             <input type="text" v-model="model.name" />
             <input type="text" id="city1" v-model="userlist[0].address[0].city" />
@@ -38,7 +41,6 @@
                 this.$methods = options.methods;
                 // console.log('-------------------------');
                 this._compile(this.$el);
-
             };
             Vue.prototype.observe = function (data, _dataname) {
                 var _this = this;
@@ -105,7 +107,6 @@
                             var event = AttrName.substring(AttrName.indexOf(":") + 1);
                             node.addEventListener(event, _this.$methods[node.getAttribute(AttrName)], false)
                         }
-
                         if (AttrName == 'v-model' && (node.tagName == "INPUT" || node.tagName == "TEXTAREA")) {
                             {
                                 var attrVal = node.getAttribute(AttrName); //user[0]
@@ -156,7 +157,7 @@
                 }
                 return obj;
             }
-            function attrstemplate(_this, node, innerHTML) {
+            function attrstemplate(_this, node, innerHTML,ischange) {
                 var html = node.innerHTML;
                 if (html.indexOf("{{") > -1 && html.indexOf("}}") > -1) {
                     var attrVal = html.substring(html.indexOf("{{") + 2, html.indexOf("}}"));
@@ -175,35 +176,17 @@
                     var firststr = html.substring(0, html.indexOf("{{"));
                     var laststr = html.substring(html.indexOf("}}") + 2);
                     node.innerHTML = firststr + _value[name] + laststr;
-                    _this._databing[attrVal].update.push(new watcher(node, _value, name,false, (_node, _value, _name) => {
+                    if(!ischange){
+                        _this._databing[attrVal].update.push(new watcher(node, _value, name,false, (_node, _value, _name) => {
                         node.innerHTML = innerHTML;
-                        attrstemplate2(_this, node, innerHTML);
+                        attrstemplate(_this, node, innerHTML,true);
                     }));
-                    return attrstemplate(_this, node, innerHTML);
-                }
-            }
-            function attrstemplate2(_this, node, innerHTML) {
-                var html = node.innerHTML;
-                if (html.indexOf("{{") > -1 && html.indexOf("}}") > -1) {
-                    var attrVal = html.substring(html.indexOf("{{") + 2, html.indexOf("}}"));
-                    var attrs = attrVal.split(".");
-                    var name = attrs[attrs.length - 1];
-                    var _value = _this;
-
-                    for (var a = 0; a < attrs.length - 1; a++) {
-                        if (attrs[a].indexOf("[") > -1 && attrs[a].indexOf("]") > -1) {
-                            var model = attrs[a].substring(0, attrs[a].indexOf("["));
-                            _value = attrsArr(_value[model], attrs[a]);
-                        } else {
-                            _value = _value[attrs[a]];
-                        }
                     }
-                    var firststr = html.substring(0, html.indexOf("{{"));
-                    var laststr = html.substring(html.indexOf("}}") + 2);
-                    node.innerHTML = firststr + _value[name] + laststr;
-                    return attrstemplate2(_this, node, innerHTML);
+                    
+                    return attrstemplate(_this, node, innerHTML,false);
                 }
             }
+
             function watcher(node, _value, name,isnow, fn) {
                 this.node = node;
                 this._value = _value;
@@ -216,7 +199,6 @@
                 if(this.isnow){
                     this.update();
                 }
-                
             };
             return Vue;
         });
@@ -232,8 +214,7 @@
             },
             methods: {
                 sayHi: function () {
-                    vue1.model.name="name2";
-                    console.log(1);
+                    vue1.model.name="hello world! ";
                 }
             }
 
