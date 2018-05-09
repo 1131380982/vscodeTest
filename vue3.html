@@ -11,9 +11,9 @@
 <body>
     <div id="app">
         <div>
-               
+
             <div>
-                {{model.name}}{{model.name}}{{userlist[0].address[0].city}}   
+                {{model.name}}{{model.name}}{{userlist[0].address[0].city}}
                 <!-- {{model.name}} 模板不支持和标签同级-->
             </div>
             <input type="text" v-model="model.name" />
@@ -47,7 +47,6 @@
                 var isarr = Array.isArray(data);
 
                 Object.keys(data).forEach((key) => {
-
                     var dataname = _dataname;
                     if (isarr) {
                         dataname = dataname + "[" + key + "]";
@@ -58,8 +57,6 @@
                         _this.observe(data[key], dataname);
                         return;
                     }
-
-
                     _this._databing[dataname] = {
                         dataname: dataname,
                         update: []
@@ -79,7 +76,7 @@
                             binding.update.forEach(function (item) {
                                 item.update();
                             });
-
+                            return;
                         })
                     })
                 });
@@ -90,41 +87,33 @@
                 for (var i = 0; i < nodes.length; i++) {
                     var node = nodes[i];
                     if (node.children.length) { _this._compile(node) }
-
                     var innerHtml = node.innerHTML;
                     if (innerHtml.indexOf("{{") > -1 && innerHtml.indexOf("}}") > -1) {  //处理{{XXXX}} 模板                                  
                         var htmls = attrstemplate(_this, node, innerHtml, false);
-                        // console.log(htmls)
                     }
-
                     var attrs = node.attributes;//属性集合
                     var attrslength = attrs.length;
-
                     for (var j = 0; j < attrslength; j++) {
                         var AttrName = attrs[j].nodeName;  //属性名
-
                         if (AttrName.indexOf("v-on") > -1) { //绑定on事件
                             var event = AttrName.substring(AttrName.indexOf(":") + 1);
                             node.addEventListener(event, _this.$methods[node.getAttribute(AttrName)], false)
                         }
                         if (AttrName == 'v-model' && (node.tagName == "INPUT" || node.tagName == "TEXTAREA")) {
                             {
-                                var attrVal = node.getAttribute(AttrName); //user[0]
+                                var attrVal = node.getAttribute(AttrName); //model.name  user[0][0].name
                                 var attrVals = attrVal.split(".");
                                 var name = attrVals[attrVals.length - 1]
                                 var _value = _this;
                                 for (var a = 0; a < attrVals.length - 1; a++) {
-
                                     if (attrVals[a].indexOf("[") > -1 && attrVals[a].indexOf("]") > -1) {
                                         var model = attrVals[a].substring(0, attrVals[a].indexOf("["));
                                         _value = attrsArr(_value[model], attrVals[a]);
-                                    } else {
-                                        _value = _value[attrVals[a]];
-                                    }
+                                    } else { _value = _value[attrVals[a]]; }
                                 }
-                                _this._databing[attrVal].update.push(new watcher(node, _value, name,true, (_node, _value, _name) => {
-                                  //  console.log(attrVal);
+                                _this._databing[attrVal].update.push(new watcher(node, _value, name, true, (_node, _value, _name) => {
                                     _node.value = _value[_name];
+                                    return;
                                 }));
                             }
                             {
@@ -134,7 +123,6 @@
                                     var name = attrVals[attrVals.length - 1]
                                     var _value = _this;
                                     for (var a = 0; a < attrVals.length - 1; a++) {
-
                                         if (attrVals[a].indexOf("[") > -1 && attrVals[a].indexOf("]") > -1) {
                                             var model = attrVals[a].substring(0, attrVals[a].indexOf("["));
                                             _value = attrsArr(_value[model], attrVals[a]);
@@ -157,7 +145,7 @@
                 }
                 return obj;
             }
-            function attrstemplate(_this, node, innerHTML,ischange) {
+            function attrstemplate(_this, node, innerHTML, ischange) {
                 var html = node.innerHTML;
                 if (html.indexOf("{{") > -1 && html.indexOf("}}") > -1) {
                     var attrVal = html.substring(html.indexOf("{{") + 2, html.indexOf("}}"));
@@ -176,28 +164,33 @@
                     var firststr = html.substring(0, html.indexOf("{{"));
                     var laststr = html.substring(html.indexOf("}}") + 2);
                     node.innerHTML = firststr + _value[name] + laststr;
-                    if(!ischange){
-                        _this._databing[attrVal].update.push(new watcher(node, _value, name,false, (_node, _value, _name) => {
-                        node.innerHTML = innerHTML;
-                        attrstemplate(_this, node, innerHTML,true);
-                    }));
+                    if (!ischange) {
+                        _this._databing[attrVal].update.push(new watcher(node, _value, name, false, (_node, _value, _name) => {
+                            node.innerHTML = innerHTML;
+                            attrstemplate(_this, node, innerHTML, true);
+                            return;
+                        }));
+                        return attrstemplate(_this, node, innerHTML, false);
+                    }else{
+                        return attrstemplate(_this, node, innerHTML, true);
                     }
                     
-                    return attrstemplate(_this, node, innerHTML,false);
                 }
             }
 
-            function watcher(node, _value, name,isnow, fn) {
+            function watcher(node, _value, name, isnow, fn) {
                 this.node = node;
                 this._value = _value;
                 this.name = name;
                 this.fn = fn;
-                this.isnow=isnow;
+                this.isnow = isnow;
                 this.update = function () {
                     this.fn(this.node, this._value, this.name);
+                    return;
                 }
-                if(this.isnow){
+                if (this.isnow) {
                     this.update();
+                    return;
                 }
             };
             return Vue;
@@ -214,7 +207,7 @@
             },
             methods: {
                 sayHi: function () {
-                    vue1.model.name="hello world! ";
+                    vue1.model.name = "hello world! ";
                 }
             }
 
