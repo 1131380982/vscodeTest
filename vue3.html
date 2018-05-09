@@ -11,6 +11,7 @@
 <body>
     <div id="app">
         <div>
+                <!-- {{model.name}}{{model.name}}{{userlist[0].address[0].city}} 不支持和标签同级-->
             <div>{{model.name}}{{model.name}}{{userlist[0].address[0].city}}</div>
             <input type="text" v-model="model.name" />
             <input type="text" v-model="model.name" />
@@ -235,6 +236,7 @@
                     console.log(1);
                 }
             }
+
         });
         console.log(vue1.model)
     </script>
