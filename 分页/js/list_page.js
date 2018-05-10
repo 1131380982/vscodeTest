@@ -63,10 +63,12 @@
                     }
                 }
                 //处理URL参数结束
-
             }
             
             var PageCount = (ListCount % PageSize == 0 ? parseInt(ListCount / PageSize) : parseInt(ListCount / PageSize) + 1);
+            if(PageCount<=1){
+                return;
+            }
             if (PageIndex > PageCount) {
                 PageIndex = PageCount;
             }

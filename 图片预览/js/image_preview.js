@@ -37,7 +37,7 @@
             //是否图片
             var file_name = fileList[i].name;
             var ext = file_name.substring(file_name.lastIndexOf("."), file_name.length).toUpperCase(); //文件扩展名
-            if (ext != ".BMP" && ext != ".PNG" && ext != ".GIF" && ext != ".JPG" && ext != ".JPEG") { continue; }
+            if (ext != ".BMP" && ext != ".PNG" && ext != ".GIF" && ext != ".JPG" && ext != ".JPEG") {alert("请选择图片"); continue; }
             // 添加到数组
             filesArr.push(fileList[i]);
 

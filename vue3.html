@@ -11,10 +11,9 @@
 <body>
     <div id="app">
         <div>
-
             <div>
-                {{model.name}}{{model.name}}{{userlist[0].address[0].city}}
-                <!-- {{model.name}} 模板不支持和标签同级-->
+                123   {{model.name}}{{model.name}}{{userlist[0].address[0].city}}
+                <!-- {{model.name}} 双括号模板要用单独的标签，不可以有子标签-->
             </div>
             <input type="text" v-model="model.name" />
             <input type="text" v-model="model.name" />
@@ -45,7 +44,6 @@
             Vue.prototype.observe = function (data, _dataname) {
                 var _this = this;
                 var isarr = Array.isArray(data);
-
                 Object.keys(data).forEach((key) => {
                     var dataname = _dataname;
                     if (isarr) {
@@ -58,7 +56,6 @@
                         return;
                     }
                     _this._databing[dataname] = {
-                        dataname: dataname,
                         update: []
                     };
                     var val = data[key];
@@ -83,6 +80,7 @@
             };
             Vue.prototype._compile = function (el) {
                 var _this = this;
+                el.innerHTML= el.innerHTML.replace(/<!--.*?-->/, '');//去除注释
                 var nodes = el.children;
                 for (var i = 0; i < nodes.length; i++) {
                     var node = nodes[i];
@@ -190,7 +188,7 @@
             return Vue;
         });
 
-        var vue1 = new Vue({  //{{xxxx}} 模板不支持和标签在同一级
+        var vue1 = new Vue({  //{{xxxx}} 双括号模板不支持和标签在同一级
             el: "#app",
             data: {
                 model: { name: "name1" },

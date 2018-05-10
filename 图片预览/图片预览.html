@@ -72,9 +72,9 @@
                 Toel: "#file_list",
                 Image_Preview: '<div class="file_model "><span  class="imagepreview_close">x</span><img  class="ImagePreview_Image" /><p class="ImagePreview_FileName"></p></div>',
                 Image_Class: ".ImagePreview_Image",
-              //  Close_Class: ".imagepreview_close",
-              //  FileName_Class: ".ImagePreview_FileName",
-              //  isRepeatedly: false,   //是否多次选择文件后一起上传 ，不填则为false
+                Close_Class: ".imagepreview_close",  //删除样式
+                FileName_Class: ".ImagePreview_FileName", //文件名样式
+                isRepeatedly: true,   //是否多次选择文件后一起上传 ，不填则为false
             })
             $(".file_input123").on("click", function () {
                 var fileObj = ImagePreview11.GetFile();
