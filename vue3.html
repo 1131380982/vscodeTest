@@ -20,7 +20,7 @@
             <input type="text" id="city1" v-model="userlist[0].address[0].city" />
             <input type="text" id="city2" v-model="userlist[0].address[0].city" />
             <div v-for="item in userlist">123</div>
-            <button v-on:click='sayHi'>change model</button>
+            <button v-on:click='sayHi'  v-on:MouseOut='sayMours'>change model</button>
         </div>
     </div>
     <script>
@@ -80,11 +80,10 @@
                 });
             };
             Vue.prototype._compile = function (el) {
-              
                 var _el=el;
                 var _this = this;
 
-                  console.log(_el);
+                //  console.log(_el);
                 el.innerHTML= el.innerHTML.replace(/<!--.*?-->/, '');//去除注释
                 var nodes = el.children;
                 for (var i = 0; i < nodes.length; i++) {
@@ -93,7 +92,7 @@
                     //     var attrVal = node.getAttribute("v-for"); 
                     //     var attrVals = attrVal.split(" in ");
                     //     var arrs=_this[attrVals[1]];
-                    // }
+                    // }           
                     if (node.children.length) { _this._compile(node) }
                     var innerHtml = node.innerHTML;
                     if (innerHtml.indexOf("{{") > -1 && innerHtml.indexOf("}}") > -1) {  //处理{{XXXX}} 模板                                  
@@ -210,8 +209,11 @@
             methods: {
                 sayHi: function () {
                     vue1.model.name = "hello world! ";
+                },
+                sayMours: function () {
+                    vue1.model.name = "hello Mours! ";
                 }
-            }
+            } 
 
         });
       //  console.log(vue1.model)
