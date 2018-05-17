@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app">
+        <div>
+            <div>
+                123   {{model.name}}{{model.name}}{{userlist[0].address[0].city}}
+                <!-- {{model.name}} 双括号模板要用单独的标签，不可以有子标签-->
+            </div>
+            <input type="text" v-model="model.name" />
+            <input type="text" v-model="model.name" />
+            <input type="text" id="city1" v-model="userlist[0].address[0].city" />
+            <input type="text" id="city2" v-model="userlist[0].address[0].city" />
+            <div v-for="item in userlist">123</div>
+            <button v-on:click='sayHi'>change model</button>
+        </div>
+    </div>
+    <script>
+        (function (global, factory) {
+            global.Vue = factory();
+        })(this, function () {
+            var Vue = function (options) {
+                if (typeof options != "object") {
+                    console.log('请传入一个对象');
+                    return;
+                }
+                this._databing = {};
+                for (item in options.data) {
+                    this[item] = options.data[item];
+                    this.observe(this[item], item);
+                }
+                this.$el = document.querySelector(options.el);
+                this.$methods = options.methods;
+                // console.log('-------------------------');
+                this._compile(this.$el);
+            };
+            Vue.prototype.observe = function (data, _dataname) {
+                var _this = this;
+                var isarr = Array.isArray(data);
+                Object.keys(data).forEach((key) => {
+                    var dataname = _dataname;
+                    if (isarr) {
+                        dataname = dataname + "[" + key + "]";
+                    } else {
+                        dataname = dataname + "." + key;
+                    }
+                    if (data[key] && (typeof data[key] == 'object')) {
+                        _this.observe(data[key], dataname);
+                        return;
+                    }
+                    _this._databing[dataname] = {
+                        update: []
+                    };
+                    var val = data[key];
+                    var binding = _this._databing[dataname];
+                    // console.log(dataname);
+                    Object.defineProperty(data, key, {
+                        enumerable: true, // 可枚举--可被for-in和Object.keys()枚举。
+                        configurable: false, // 目标属性不能被删除和不能修再被改特性
+                        get: function () {
+                            return val;
+                        },
+                        set: (function (newVal) {
+                            val = newVal;
+                            //console.log(binding);
+                            binding.update.forEach(function (item) {
+                                item.update();
+                            });
+                            return;
+                        })
+                    })
+                });
+            };
+            Vue.prototype._compile = function (el) {
+              
+                var _el=el;
+                var _this = this;
+
+                  console.log(_el);
+                el.innerHTML= el.innerHTML.replace(/<!--.*?-->/, '');//去除注释
+                var nodes = el.children;
+                for (var i = 0; i < nodes.length; i++) {
+                    var node = nodes[i];
+                    // if(node.hasAttribute("v-for")){
+                    //     var attrVal = node.getAttribute("v-for"); 
+                    //     var attrVals = attrVal.split(" in ");
+                    //     var arrs=_this[attrVals[1]];
+                    // }
+                    if (node.children.length) { _this._compile(node) }
+                    var innerHtml = node.innerHTML;
+                    if (innerHtml.indexOf("{{") > -1 && innerHtml.indexOf("}}") > -1) {  //处理{{XXXX}} 模板                                  
+                        var htmls = attrstemplate(_this, node, innerHtml, false);
+                    }
+                    var attrs = node.attributes;//属性集合
+                    var attrslength = attrs.length;
+                    for (var j = 0; j < attrslength; j++) {
+                        var AttrName = attrs[j].nodeName;  //属性名
+                        if (AttrName.indexOf("v-on") > -1) { //绑定on事件
+                            var event = AttrName.substring(AttrName.indexOf(":") + 1);
+                            node.addEventListener(event, _this.$methods[node.getAttribute(AttrName)], false)
+                        }
+                        if (AttrName == 'v-model' && (node.tagName == "INPUT" || node.tagName == "TEXTAREA")) {
+                            {
+                                var attrVal = node.getAttribute(AttrName); //model.name  user[0][0].name
+                                var attrVals = attrVal.split(".");
+                                var name = attrVals[attrVals.length - 1]
+                                var _value = _this;
+                                for (var a = 0; a < attrVals.length - 1; a++) {
+                                    if (attrVals[a].indexOf("[") > -1 && attrVals[a].indexOf("]") > -1) {
+                                        var model = attrVals[a].substring(0, attrVals[a].indexOf("["));
+                                        _value = attrsArr(_value[model], attrVals[a]);
+                                    } else { _value = _value[attrVals[a]]; }
+                                }
+                                _this._databing[attrVal].update.push(new watcher(node, _value, name, true, (_node, _value, _name) => {
+                                    _node.value = _value[_name];
+                                }));
+                            }
+                            {
+                                node.addEventListener('input', function (e) {
+                                    var attrVal = this.getAttribute('v-model');
+                                    var attrVals = attrVal.split(".");
+                                    var name = attrVals[attrVals.length - 1]
+                                    var _value = _this;
+                                    for (var a = 0; a < attrVals.length - 1; a++) {
+                                        if (attrVals[a].indexOf("[") > -1 && attrVals[a].indexOf("]") > -1) {
+                                            var model = attrVals[a].substring(0, attrVals[a].indexOf("["));
+                                            _value = attrsArr(_value[model], attrVals[a]);
+                                        } else {
+                                            _value = _value[attrVals[a]];
+                                        }
+                                    }
+                                    _value[name] = this.value;
+                                });
+                            };
+                        }
+                    }
+                }
+            };
+            function attrsArr(obj, str) {
+                if (str.indexOf("[") > -1 && str.indexOf("]") > -1) {
+                    var number = parseInt(str.substring(str.indexOf("[") + 1, str.indexOf("]")));
+                    str = str.substring(str.indexOf("]") + 1);
+                    return attrsArr(obj[number], str);
+                }
+                return obj;
+            }
+            function attrstemplate(_this, node, innerHTML, ischange) {
+                var html = node.innerHTML;
+                if (html.indexOf("{{") > -1 && html.indexOf("}}") > -1) {
+                    var attrVal = html.substring(html.indexOf("{{") + 2, html.indexOf("}}"));
+                    var attrs = attrVal.split(".");
+                    var name = attrs[attrs.length - 1];
+                    var _value = _this;
+
+                    for (var a = 0; a < attrs.length - 1; a++) {
+                        if (attrs[a].indexOf("[") > -1 && attrs[a].indexOf("]") > -1) {
+                            var model = attrs[a].substring(0, attrs[a].indexOf("["));
+                            _value = attrsArr(_value[model], attrs[a]);
+                        } else {
+                            _value = _value[attrs[a]];
+                        }
+                    }
+                    var firststr = html.substring(0, html.indexOf("{{"));
+                    var laststr = html.substring(html.indexOf("}}") + 2);
+                    node.innerHTML = firststr + _value[name] + laststr;
+                    if (!ischange) {
+                        _this._databing[attrVal].update.push(new watcher(node, _value, name, false, (_node, _value, _name) => {
+                            node.innerHTML = innerHTML;
+                            attrstemplate(_this, node, innerHTML, true);
+                        }));
+                        return attrstemplate(_this, node, innerHTML, false);
+                    }else{
+                        return attrstemplate(_this, node, innerHTML, true);
+                    }
+                }
+            }
+            function watcher(node, _value, name, isnow, fn) {
+                this.node = node;
+                this._value = _value;
+                this.name = name;
+                this.fn = fn;
+                this.isnow = isnow;
+                this.update = function () {
+                    this.fn(this.node, this._value, this.name);
+                }
+                if (this.isnow) {
+                    this.update();
+                }
+            };
+            return Vue;
+        });
+
+        var vue1 = new Vue({  //{{xxxx}} 双括号模板不支持和标签在同一级
+            el: "#app",
+            data: {
+                model: { name: "name1" },
+                userlist: [
+                    { name: "user1", address: [{ city: "深圳" }, { city: "南昌" }, { city: "北京" }] },
+                    { name: "user2", address: [{ city: "深圳" }, { city: "南昌" }, { city: "北京" }] },
+                ],
+            },
+            methods: {
+                sayHi: function () {
+                    vue1.model.name = "hello world! ";
+                }
+            }
+
+        });
+      //  console.log(vue1.model)
+    </script>
+</body>
+
+</html>
